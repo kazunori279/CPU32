@@ -7,15 +7,15 @@ Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
 
 ## Instruction Set
 
-### MIPS I architecture
+* MIPS I architecture
 * Supports [basic arithmetic ops](https://github.com/kazunori279/CPU32/blob/master/src/alu.v), [branches](https://github.com/kazunori279/CPU32/blob/master/src/program_counter.v) and [other ops](https://github.com/kazunori279/CPU32/blob/master/src/decoder.v)
 * Does not support floating points, exceptions and etc
 
 ## Features
 
-* Single clocked design (no pipeline or stage)
+* Single clocked design (no pipeline)
 * 32KB RAM (with Block RAM of Cyclone III)
-* I/O: DE0 7-seg LEDs for output, sw3 - sw0 for input
+* I/O: 7-seg LEDs for output, sw3 - sw0 for input
 * Runs MIPS I binary code generated from basic C program
 * No bus/cache/MMU support
 * May have some bugs :)
@@ -29,9 +29,9 @@ Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
 
 ### Build
 * Create a Quartus project for CPU32
-* Import files of /src and /conf folders. You may need to specify properties of .v files to "SystemVerilog"
-* "Start Analysis & Elaboration" for initial compilation
-* Use Pin Planner for pin assignment for CPU32.v inputs and outputs for LEDs, SWs and buttons
+* Import files of /src and /conf folders. Open property dialog of .v files and set language to "SystemVerilog"
+* Start Analysis & Elaboration for initial check
+* Use Pin Planner for pin assignment for CPU32.v for LEDs, switches and buttons
 * Start Compilation for full build. This may takes several minutes
 
 ### Run Fibonacci
@@ -40,7 +40,7 @@ Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
 
 ## Run your own C code on CPU32
 
-### GNU MIPS toolchain
+### GNU gcc toolchain for MIPS
 * Prepare for GNU gcc and as (assembler) for MIPS architecture on Linux
 
 ### Write a C code (for example: [fib.c](https://github.com/kazunori279/CPU32/blob/master/conf/fib.c))
@@ -54,9 +54,9 @@ Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
 `> mips-gcc -S test.c`
 
 * Edit the .s file to remove all assembler macros (lines starting with "."). Now the .s file may look like this: [fib.s](https://github.com/kazunori279/CPU32/blob/master/conf/fib.s)
-* Assemble the .s file to generate a.out (binary) file. Use -O0 option to generate only MIPS I code
+* Assemble the .s file to generate a.out (binary) file. Use -mips1 -O0 option to generate only unoptimized MIPS I code
 
-`> mips-as -O0 test.s`
+`> mips-as -mips1 -O0 test.s`
 
 ### Package the binary into .mif file
 * Extract hex strings by using readelf and [textdump.py](https://github.com/kazunori279/CPU32/blob/master/conf/textdump.py)
@@ -81,13 +81,13 @@ Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
               0x7f00 : to display a value on LED 
               0x7ff0 : to input params from sw3 - sw0
 
-### LED modes
+### 7-seg LED display modes
 
-LED display to show $7ff0, PC or registers
+The 7-seg LED displays $7ff0, PC or registers, based on switch setting:
 
-    sw9:   off = $7ff0,     on = PC or registers
-    sw8:   off = PC,        on = reg
-    sw7:   off = low bits,  on = high bits
+    sw9:   off = $7ff0      on = PC or registers
+    sw8:   off = PC         on = reg
+    sw7:   off = low bytes  on = high bytes
     sw6-5: not used
     sw4-0: register address
 
