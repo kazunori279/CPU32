@@ -4,9 +4,9 @@ Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
 
 ## Instruction Set
 
-* MIPS I architecture
-    * Supports [basic arithmetic ops](https://github.com/kazunori279/CPU32/blob/master/src/alu.v), [branches](https://github.com/kazunori279/CPU32/blob/master/src/program_counter.v) and [other ops](https://github.com/kazunori279/CPU32/blob/master/src/decoder.v)
-    * Does not support floating points, exceptions and etc
+### MIPS I architecture
+* Supports [basic arithmetic ops](https://github.com/kazunori279/CPU32/blob/master/src/alu.v), [branches](https://github.com/kazunori279/CPU32/blob/master/src/program_counter.v) and [other ops](https://github.com/kazunori279/CPU32/blob/master/src/decoder.v)
+* Does not support floating points, exceptions and etc
 
 ## Features
 
@@ -21,11 +21,12 @@ Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
 
 ### Prerequisites
 * Terasic DE0/DEx or Altera FPGA development environment, including Altera Quartus II Web edition on Windows
+* (Alternatively, you could use ModelSim for simulation only purpose)
 * Experience of basic Altera FPGA development
 
 ### Build
 * Create a Quartus project for CPU32
-* Import files under /src folder. You may need to specify properties of .v files to "SystemVerilog"
+* Import files of /src and /conf folders. You may need to specify properties of .v files to "SystemVerilog"
 * "Start Analysis & Elaboration" for initial compilation
 * Use Pin Planner for pin assignment for CPU32.v inputs and outputs for LEDs, SWs and buttons
 * Start Compilation for full build. This may takes several minutes
@@ -39,7 +40,7 @@ Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
 ### GNU MIPS toolchain
 * Prepare for GNU gcc and as (assembler) for MIPS architecture on Linux
 
-### Write a C code (for example: [fib.c](https://github.com/kazunori279/CPU32/blob/master/src/fib.c))
+### Write a C code (for example: [fib.c](https://github.com/kazunori279/CPU32/blob/master/conf/fib.c))
 * If you want to use LED display and switch inputs, see Memory Mapping section
 * You can not use any code that may generate exceptions (system calls, interupts etc)
 * You only have 32KB for both binary and stack
@@ -49,20 +50,20 @@ Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
 
 `> mips-gcc -S test.c`
 
-* Edit the .s file to remove all assembler macros (lines starting with "."). Now the .s file may look like this: [fib.s](https://github.com/kazunori279/CPU32/blob/master/src/fib.s)
+* Edit the .s file to remove all assembler macros (lines starting with "."). Now the .s file may look like this: [fib.s](https://github.com/kazunori279/CPU32/blob/master/conf/fib.s)
 * Assemble the .s file to generate a.out (binary) file. Use -O0 option to generate only MIPS I code
 
 `> mips-as -O0 test.s`
 
 ### Package the binary into .mif file
-* Extract hex strings by using readelf and [textdump.py](https://github.com/kazunori279/CPU32/blob/master/src/textdump.py)
+* Extract hex strings by using readelf and [textdump.py](https://github.com/kazunori279/CPU32/blob/master/conf/textdump.py)
 
 `> readelf -x .text a.out | python textdump.py`
 
-* Use text editor or spreadsheet to convert the hex strings to .mif file format (for example: [fib.mif](https://github.com/kazunori279/CPU32/blob/master/src/fib.mif))
+* Use text editor or spreadsheet to convert the hex strings to .mif file format (for example: [fib.mif](https://github.com/kazunori279/CPU32/blob/master/conf/fib.mif))
 
-### Run the binary with CPI32
-* Place the mif file under /src folder
+### Run the binary on CPU32
+* Place the mif file under /conf folder
 * Edit bram.v file and replace "src/fib.mif" with the path of your mif file
 * Start Compilation on Quartus II and load it to the board
 
@@ -74,8 +75,18 @@ Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
            <- 0x7efc : stack
     0x7f00 -- 0x7fff : global
 
-              0x7f00 : to display result on LED 
+              0x7f00 : to display a value on LED 
               0x7ff0 : to input params from sw3 - sw0
+
+### LED modes
+
+LED display to show $7ff0, PC or registers
+
+    sw9:   off = $7ff0,     on = PC or registers
+    sw8:   off = PC,        on = reg
+    sw7:   off = low bits,  on = high bits
+    sw6-5: not used
+    sw4-0: register address
 
 ## License
 
