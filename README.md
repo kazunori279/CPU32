@@ -2,6 +2,9 @@
 
 Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
 
+## Demo
+* Calculating Fibonacci numbers: [video](https://plus.google.com/u/0/+KazunoriSato/posts/AfJxuCjYNbS)
+
 ## Instruction Set
 
 ### MIPS I architecture
@@ -64,7 +67,7 @@ Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
 
 ### Run the binary on CPU32
 * Place the mif file under /conf folder
-* Edit bram.v file and replace "src/fib.mif" with the path of your mif file
+* Edit [bram.v](https://github.com/kazunori279/CPU32/blob/master/src/bram.v) file and replace "conf/fib.mif" with the path of your mif file
 * Start Compilation on Quartus II and load it to the board
 
 ## Memory Mappings and I/O access
