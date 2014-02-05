@@ -57,7 +57,7 @@ Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
 - Package the binary into .mif file
 -- Extract hex strings by using readelf and [textdump.py](https://github.com/kazunori279/CPU32/blob/master/src/textdump.py)
 
-    >  readelf -x .text a.out | python textdump.py
+    > readelf -x .text a.out | python textdump.py
 
 -- Use text editor or spreadsheet to convert the hex strings to .mif file format (for example: [fib.mif](https://github.com/kazunori279/CPU32/blob/master/src/fib.mif))
 
