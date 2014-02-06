@@ -1,6 +1,6 @@
 # CPU32
 
-Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
+A tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
 
 ## Demo
 * Calculating Fibonacci numbers: [video](https://plus.google.com/u/0/+KazunoriSato/posts/AfJxuCjYNbS)
@@ -28,9 +28,9 @@ Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
 * Experience of basic Altera FPGA development
 
 ### Build
-* Create a Quartus project for CPU32
-* Import files of /src and /conf folders. Open property dialog of .v files and set language to "SystemVerilog"
-* Start Analysis & Elaboration for initial check
+* Create a Quartus project named CPU32
+* Copy /src and /conf folders under the project folder and add .v files to the project. 
+* Start Analysis & Elaboration for initial check. You would have errors on some .v files. Open property dialog and set language to "SystemVerilog"
 * Use Pin Planner for pin assignment for CPU32.v for LEDs, switches and buttons
 * Start Compilation for full build. This may takes several minutes
 
@@ -40,33 +40,15 @@ Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
 
 ## Run your own C code on CPU32
 
-### GNU gcc toolchain for MIPS
-* Prepare for GNU gcc and as (assembler) for MIPS architecture on Linux
+### Compile C code and generate MIF file
+* Prepare for MIPS gcc toolchain on any Linux environment. Add mips-gcc/bin directory to your PATH
+* Install Python runtime
+* Use [c2mif.py](https://github.com/kazunori279/CPU32/blob/master/conf/c2mif.py) to compile .c file and generate .mif file
 
-### Write a C code (for example: [fib.c](https://github.com/kazunori279/CPU32/blob/master/conf/fib.c))
-* If you want to use LED display and switch inputs, see Memory Mapping section
-* You can not use any code that may generate exceptions (system calls, interupts etc)
-* You only have 32KB for both binary and stack
-
-### Compile the C code
-* Compile the C code to generate .s (assembler) code
-
-`> mips-gcc -S test.c`
-
-* Edit the .s file to remove all assembler macros (lines starting with "."). Now the .s file may look like this: [fib.s](https://github.com/kazunori279/CPU32/blob/master/conf/fib.s)
-* Assemble the .s file to generate a.out (binary) file. Use -mips1 -O0 option to generate only unoptimized MIPS I code
-
-`> mips-as -mips1 -O0 test.s`
-
-### Package the binary into .mif file
-* Extract hex strings by using readelf and [textdump.py](https://github.com/kazunori279/CPU32/blob/master/conf/textdump.py)
-
-`> readelf -x .text a.out | python textdump.py`
-
-* Use text editor or spreadsheet to convert the hex strings to .mif file format (for example: [fib.mif](https://github.com/kazunori279/CPU32/blob/master/conf/fib.mif))
+`> python c2mif.py fib.c`
 
 ### Run the binary on CPU32
-* Place the mif file under /conf folder
+* Copy the mif file from the Linux to /conf folder in the Quartus project
 * Edit [bram.v](https://github.com/kazunori279/CPU32/blob/master/src/bram.v) file and replace "conf/fib.mif" with the path of your mif file
 * Start Compilation on Quartus II and load it to the board
 
@@ -83,9 +65,9 @@ Tiny MIPS implementation for Terasic DE0/DEx and other Altera FPGA boards
 
 ### 7-seg LED display modes
 
-The 7-seg LED displays $7ff0, PC or registers, based on switch setting:
+The 7-seg LED displays $7f00, PC or registers, based on switch setting:
 
-    sw9:   off = $7ff0      on = PC or registers
+    sw9:   off = $7f00      on = PC or registers
     sw8:   off = PC         on = reg
     sw7:   off = low bytes  on = high bytes
     sw6-5: not used
